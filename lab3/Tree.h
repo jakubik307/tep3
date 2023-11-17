@@ -1,4 +1,5 @@
 #pragma once
+#include <set>
 #include <string>
 #include <vector>
 
@@ -17,6 +18,7 @@ class Node {
 public:
     Node(int maxChildrenCount);
     Node(int maxChildrenCount, Node* parent);
+    Node(const Node& other);
     virtual ~Node();
     bool addChild(Node* child);
     int getChildrenCount();
@@ -33,7 +35,7 @@ class OperatorNode : public Node {
 public:
     OperatorNode(Operation op);
     OperatorNode(Node* parent, Operation op);
-    ~OperatorNode();
+    std::string ToString();
 
 private:
     Operation operation;
@@ -45,7 +47,7 @@ class VariableNode : public Node {
 public:
     VariableNode(std::string name);
     VariableNode(Node* parent, std::string name);
-    ~VariableNode();
+    std::string ToString();
 
 private:
     std::string name;
@@ -57,7 +59,7 @@ class NumberNode : public Node {
 public:
     NumberNode(double value);
     NumberNode(Node* parent, double value);
-    ~NumberNode();
+    std::string ToString();
 
 private:
     double value;
@@ -67,16 +69,22 @@ private:
 
 class Tree {
 public:
-    Tree(std::string formula);
+    Tree();
+    Tree(Node* root);
+    Tree(std::string& formula, bool& isCorrect);
     Tree(Tree const& other);
     ~Tree();
     Tree operator+(const Tree& other) const;
     Tree& operator=(const Tree& other);
 
+    std::set<std::string> getVariables();
+    std::string toString();
+    double calculateFormula(std::vector<double>& values, bool& isSizeCorrect);
+    Tree joinTrees(std::string& formula);
+
 private:
     Node* root;
-    std::string formula;
 
     void copy(Tree const& other);
-    std::string fixFormula(std::string formula);
+    std::set<std::string> getVariablesRecursive(Node* currentNode, std::set<std::string>& variables);
 };

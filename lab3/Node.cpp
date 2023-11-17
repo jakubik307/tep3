@@ -16,10 +16,22 @@ Node::Node(int maxChildrenCount, Node* parent)
     children = std::vector<Node*>();
 }
 
+// TODO: chceck if copying nullptr is okay in all usages
+Node::Node(const Node& other)
+    : parent(nullptr)
+    , maxChildrenCount(other.maxChildrenCount)
+{
+    for (const Node* childNode : other.children) {
+        Node* newChild = new Node(*childNode);
+        newChild->parent = this;
+        children.push_back(newChild);
+    }
+}
+
 Node::~Node()
 {
-    for (Node* node : children) {
-        delete node;
+    for (Node* childNode : children) {
+        delete childNode;
     }
 }
 
@@ -51,8 +63,21 @@ OperatorNode::OperatorNode(Node* parent, Operation op)
 {
 }
 
-OperatorNode::~OperatorNode()
+std::string OperatorNode::ToString()
 {
+    if (operation == plus) {
+        return "+";
+    } else if (operation == minus) {
+        return "-";
+    } else if (operation == multiply) {
+        return "*";
+    } else if (operation == divide) {
+        return "/";
+    } else if (operation == sin_op) {
+        return "sin";
+    } else if (operation == cos_op) {
+        return "cos";
+    }
 }
 
 // VARIABLE
@@ -69,9 +94,9 @@ VariableNode::VariableNode(Node* parent, std::string name)
 {
 }
 
-VariableNode::~VariableNode()
+std::string VariableNode::ToString()
 {
-    // TODO: check if that shit runs default destructor
+    return name;
 }
 
 // NUMBER
@@ -88,7 +113,7 @@ NumberNode::NumberNode(Node* parent, double value)
 {
 }
 
-NumberNode::~NumberNode()
+std::string NumberNode::ToString()
 {
-    // TODO: check if that shit runs default destructor
+    return std::to_string(value);
 }
