@@ -2,7 +2,7 @@
 
 Tree::Tree()
 {
-    root = nullptr;
+    root = new Node(0);
 }
 
 Tree::Tree(Node* root)
@@ -12,7 +12,7 @@ Tree::Tree(Node* root)
 
 Tree::Tree(std::string& formula, bool& isCorrect)
 {
-    
+    // TODO
 }
 
 Tree::Tree(Tree const& other)
@@ -38,9 +38,16 @@ Tree Tree::operator+(const Tree& other) const
     if (leafNode != nullptr) {
         Tree copyOfOther(other);
 
-        delete leafNode;
+        copyOfOther.root->parent = leafNode->parent;
+        if (leafNode->parent != nullptr) {
+            for (Node* node : leafNode->parent->children) {
+                if (node == leafNode) {
+                    node = copyOfOther.root;
+                }
+            }
+        }
 
-        *leafNode = *copyOfOther.root;
+        delete leafNode;
     }
 
     return result;
@@ -61,11 +68,12 @@ void Tree::copy(Tree const& other)
     root = new Node(*other.root);
 }
 
-std::set<std::string> Tree::getVariables()
+std::vector<std::string> Tree::getVariables()
 {
-    std::set<std::string> variables;
-    getVariablesRecursive(root, variables);
-    return variables;
+    std::set<std::string> variablesSet;
+    root->getVariables(variablesSet);
+    std::vector<std::string> variablesVector(variablesSet.begin(), variablesSet.end());
+    return variablesVector;
 }
 
 std::string Tree::toString()
@@ -80,21 +88,22 @@ std::string Tree::toString()
 
 double Tree::calculateFormula(std::vector<double>& values, bool& isSizeCorrect)
 {
-    // TODO: implement this
-    return 0.0;
-}
+    std::vector<std::string> variables = getVariables();
 
-std::set<std::string> Tree::getVariablesRecursive(Node* currentNode, std::set<std::string>& variables)
-{
-    // Rewrite as recursive node function 
-    if (currentNode == nullptr) {
-        return variables;
+    if (variables.size() != values.size()) {
+        isSizeCorrect = false;
+        return 0.0;
+    } else {
+        isSizeCorrect = true;
     }
 
-    for (Node* childNode : currentNode->children) {
-        VariableNode* variableNode = dynamic_cast<VariableNode*>(currentNode);
-        if (dynamic_cast<VariableNode*>(currentNode) != nullptr) {
-            variables.insert(variableNode->name);
-        }
+    std::map<std::string, double> variableValues;
+
+    for (size_t i = 0; i < variables.size(); i++) {
+        variableValues[variables[i]] = values[i];
     }
+
+    double result = root->calculateValue(variableValues);
+
+    return result;
 }

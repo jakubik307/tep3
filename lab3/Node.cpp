@@ -54,6 +54,18 @@ std::string Node::toString(std::string& acc)
     return acc;
 }
 
+std::set<std::string> Node::getVariables(std::set<std::string>& variables)
+{
+    for (Node* childNode : children) {
+        VariableNode* variableNode = dynamic_cast<VariableNode*>(this);
+        if (variableNode != nullptr) {
+            variables.insert(variableNode->name);
+        }
+    }
+
+    return variables;
+}
+
 // OPERATOR
 
 OperatorNode::OperatorNode(Operation op)
@@ -95,7 +107,7 @@ std::string OperatorNode::toString(std::string& acc)
 
 // VARIABLE
 
-VariableNode::VariableNode(std::string name) 
+VariableNode::VariableNode(std::string name)
     : Node(0)
     , name(name)
 {

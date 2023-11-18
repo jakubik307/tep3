@@ -2,6 +2,7 @@
 #include <set>
 #include <string>
 #include <vector>
+#include <map>
 
 const double DEFAULT_VALUE = 1;
 
@@ -23,6 +24,7 @@ public:
     bool addChild(Node* child);
     int getChildrenCount();
     std::string toString(std::string& acc);
+    std::set<std::string> getVariables(std::set<std::string>& variables);
 
 private:
     Node* parent;
@@ -57,6 +59,7 @@ private:
     std::string name;
 
     friend class Tree;
+    friend class Node;
 };
 
 class NumberNode : public Node {
@@ -82,7 +85,7 @@ public:
     Tree operator+(const Tree& other) const;
     Tree& operator=(const Tree& other);
 
-    std::set<std::string> getVariables();
+    std::vector<std::string> getVariables();
     std::string toString();
     double calculateFormula(std::vector<double>& values, bool& isSizeCorrect);
 
@@ -90,5 +93,4 @@ private:
     Node* root;
 
     void copy(Tree const& other);
-    std::set<std::string> getVariablesRecursive(Node* currentNode, std::set<std::string>& variables);
 };

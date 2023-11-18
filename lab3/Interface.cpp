@@ -7,42 +7,58 @@ void runInterface()
     std::string input = "start";
 
     while (input != "quit" && input != "exit") {
-        // Get user input and transform it to lowercase
         std::cout << "Waiting for user input:" << std::endl;
         std::getline(std::cin, input);
         input = toLowercase(input);
+        input = strip(input);
 
-        // Split command and parameters
-        // TODO: no params bug
-        std::istringstream iss(input);
-        std::string command, params;
+        if (!input.empty()) {
+            std::istringstream iss(input);
+            std::string command, params;
+            params = "";
 
-        iss >> command;
+            iss >> command;
 
-        std::getline(iss, params);
-        params.erase(params.find_first_not_of(" \t"));
-
-        // TODO : export strings to .h
-        // Execute user input
-        if (command == "enter") {
-            tree = Tree(params, isCorrect);
-            if (!isCorrect) {
-                std::cout << "Error: Formula is not correct. Expression will be corrected.";
+            if (iss) {
+                std::getline(iss, params);
+                params = strip(params);
             }
-            std::cout << "Processing formula: " + tree.toString() << std::endl;
 
-        } else if (command == "vars") {
-            for (std::string variable : tree.getVariables()) {
-                std::cout << variable + " ";
+            // TODO : export strings to .h
+            if (command == "enter") {
+                tree = Tree(params, isCorrect);
+                if (!isCorrect) {
+                    std::cout << "Error: Formula is not correct. Expression will be corrected.";
+                    std::cout << "Processing formula: " + tree.toString() << std::endl;
+                }
+            } else if (command == "vars") {
+                std::set<std::string> variables = tree.getVariables();
+                if (!variables.empty()) {
+                    for (std::string variable : tree.getVariables()) {
+                        std::cout << variable + " ";
+                    }
+                    std ::cout << std::endl;
+                } else {
+                    std::cout << "No variables in the tree" << std::endl;
+                }
+            } else if (command == "print") {
+                std::cout << tree.toString() << std::endl;
+            } else if (command == "comp") {
+                // TODO
+            } else if (command == "join") {
+                Tree newTree = Tree(params, isCorrect);
+                if (!isCorrect) {
+                    std::cout << "Error: Formula is not correct. Expression will be corrected.";
+                    std::cout << "Processing formula: " + newTree.toString() << std::endl;
+                }
+                tree = tree + newTree;
+                std::cout << "Merge succesful: " + newTree.toString() << std::endl;
+
+            } else {
+                std::cout << "Error: Unknown command." << std::endl;
             }
-            std ::cout << std::endl;
-
-        } else if (command == "comp") {
-           
-        } else if (command == "join") {
-            // TODO
         } else {
-            std::cout << "" << std::endl;
+            std::cout << "Error: Empty input. Please enter a valid command." << std::endl;
         }
     }
 }
@@ -57,7 +73,6 @@ std::string toLowercase(std::string& input)
         output += char(tolower(c));
         i++;
     }
-    std::cout << output;
     return output;
 }
 
