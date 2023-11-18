@@ -22,6 +22,7 @@ public:
     virtual ~Node();
     bool addChild(Node* child);
     int getChildrenCount();
+    std::string toString(std::string& acc);
 
 private:
     Node* parent;
@@ -29,13 +30,16 @@ private:
     std::vector<Node*> children;
 
     friend class Tree;
+    friend class OperatorNode;
+    friend class VariableNode;
+    friend class NumberNode;
 };
 
 class OperatorNode : public Node {
 public:
     OperatorNode(Operation op);
     OperatorNode(Node* parent, Operation op);
-    std::string ToString();
+    std::string toString(std::string& acc);
 
 private:
     Operation operation;
@@ -47,7 +51,7 @@ class VariableNode : public Node {
 public:
     VariableNode(std::string name);
     VariableNode(Node* parent, std::string name);
-    std::string ToString();
+    std::string toString(std::string& acc);
 
 private:
     std::string name;
@@ -59,12 +63,13 @@ class NumberNode : public Node {
 public:
     NumberNode(double value);
     NumberNode(Node* parent, double value);
-    std::string ToString();
+    std::string toString(std::string& acc);
 
 private:
     double value;
 
     friend class Tree;
+    friend class Node;
 };
 
 class Tree {
@@ -80,7 +85,6 @@ public:
     std::set<std::string> getVariables();
     std::string toString();
     double calculateFormula(std::vector<double>& values, bool& isSizeCorrect);
-    Tree joinTrees(std::string& formula);
 
 private:
     Node* root;

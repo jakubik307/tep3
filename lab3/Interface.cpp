@@ -57,5 +57,39 @@ std::string toLowercase(std::string& input)
         output += char(tolower(c));
         i++;
     }
+    std::cout << output;
     return output;
+}
+
+std::string strip(std::string& input)
+{
+    std::string result;
+
+    // Remove leading whitespaces
+    size_t startPos = input.find_first_not_of(" \t");
+    if (startPos != std::string::npos) {
+        input = input.substr(startPos);
+    }
+
+    // Remove trailing whitespaces
+    size_t endPos = input.find_last_not_of(" \t");
+    if (endPos != std::string::npos) {
+        input = input.substr(0, endPos + 1);
+    }
+
+    // Reduce consecutive spaces to a single space
+    bool isSpace = false;
+    for (char c : input) {
+        if (std::isspace(c)) {
+            if (!isSpace) {
+                result += ' ';
+                isSpace = true;
+            }
+        } else {
+            result += c;
+            isSpace = false;
+        }
+    }
+
+    return result;
 }

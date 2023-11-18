@@ -27,13 +27,27 @@ Tree::~Tree()
 
 Tree Tree::operator+(const Tree& other) const
 {
-    // TODO: implement
-    return Tree();
+    Tree result(*this);
+
+    // Find the first leaf node with no children
+    Node* leafNode = result.root;
+    while (leafNode != nullptr && !leafNode->children.empty()) {
+        leafNode = leafNode->children.front();
+    }
+
+    if (leafNode != nullptr) {
+        Tree copyOfOther(other);
+
+        delete leafNode;
+
+        *leafNode = *copyOfOther.root;
+    }
+
+    return result;
 }
 
 Tree& Tree::operator=(const Tree& other)
 {
-    // TODO: check if return is correct
     copy(other);
     return *this;
 }
@@ -56,25 +70,25 @@ std::set<std::string> Tree::getVariables()
 
 std::string Tree::toString()
 {
-    // TODO: WORK WITH NODE TO STRING
-    return std::string();
+    std::string acc = "";
+    if (root != nullptr) {
+        return root->toString(acc);
+    } else {
+        return "Empty Tree";
+    }
 }
 
 double Tree::calculateFormula(std::vector<double>& values, bool& isSizeCorrect)
 {
+    // TODO: implement this
     return 0.0;
-}
-
-Tree Tree::joinTrees(std::string& formula)
-{
-    return Tree();
 }
 
 std::set<std::string> Tree::getVariablesRecursive(Node* currentNode, std::set<std::string>& variables)
 {
     // Rewrite as recursive node function 
     if (currentNode == nullptr) {
-        return;
+        return variables;
     }
 
     for (Node* childNode : currentNode->children) {

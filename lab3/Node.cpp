@@ -49,6 +49,11 @@ int Node::getChildrenCount()
     return children.size();
 }
 
+std::string Node::toString(std::string& acc)
+{
+    return acc;
+}
+
 // OPERATOR
 
 OperatorNode::OperatorNode(Operation op)
@@ -63,26 +68,34 @@ OperatorNode::OperatorNode(Node* parent, Operation op)
 {
 }
 
-std::string OperatorNode::ToString()
+std::string OperatorNode::toString(std::string& acc)
 {
     if (operation == plus) {
-        return "+";
+        acc += "+";
     } else if (operation == minus) {
-        return "-";
+        acc += "-";
     } else if (operation == multiply) {
-        return "*";
+        acc += "*";
     } else if (operation == divide) {
-        return "/";
+        acc += "/";
     } else if (operation == sin_op) {
-        return "sin";
+        acc += "sin";
     } else if (operation == cos_op) {
-        return "cos";
+        acc += "cos";
     }
+
+    acc += " ";
+
+    for (Node* childNode : children) {
+        childNode->toString(acc);
+    }
+
+    return acc;
 }
 
 // VARIABLE
 
-VariableNode::VariableNode(std::string name)
+VariableNode::VariableNode(std::string name) 
     : Node(0)
     , name(name)
 {
@@ -94,9 +107,16 @@ VariableNode::VariableNode(Node* parent, std::string name)
 {
 }
 
-std::string VariableNode::ToString()
+std::string VariableNode::toString(std::string& acc)
 {
-    return name;
+    acc += name;
+    acc += " ";
+
+    for (Node* childNode : children) {
+        childNode->toString(acc);
+    }
+
+    return acc;
 }
 
 // NUMBER
@@ -113,7 +133,14 @@ NumberNode::NumberNode(Node* parent, double value)
 {
 }
 
-std::string NumberNode::ToString()
+std::string NumberNode::toString(std::string& acc)
 {
-    return std::to_string(value);
+    acc += std::to_string(value);
+    acc += " ";
+
+    for (Node* childNode : children) {
+        childNode->toString(acc);
+    }
+
+    return acc;
 }

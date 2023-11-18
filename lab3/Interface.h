@@ -9,4 +9,6 @@
 void runInterface();
 
 // Helper methods
+
 std::string toLowercase(std::string& input);
+std::string strip(std::string& input);
