@@ -1,20 +1,20 @@
 #pragma once
+#include <cctype>
+#include <map>
 #include <set>
+#include <sstream>
 #include <string>
 #include <vector>
-#include <map>
-#include <sstream>
-#include <cctype>
 
 const double DEFAULT_VALUE = 1;
 
 const enum Operation {
-    plus = 2,
-    minus = 2,
-    multiply = 2,
-    divide = 2,
-    sin_op = 1,
-    cos_op = 1
+    plus,
+    minus,
+    multiply,
+    divide,
+    sin_op,
+    cos_op
 };
 
 class Node {
@@ -25,7 +25,7 @@ public:
     virtual ~Node();
     bool addChild(Node* child);
     int getChildrenCount();
-    virtual std::string toString(std::string& acc);
+    virtual std::string toString(std::string& acc) = 0;
     std::set<std::string> getVariables(std::set<std::string>& variables);
     double calculateValue(std::map<std::string, double>& variableValues);
 
@@ -33,6 +33,7 @@ private:
     Node* parent;
     int maxChildrenCount;
     std::vector<Node*> children;
+    virtual Node* clone() const = 0;
 
     friend class Tree;
     friend class OperatorNode;
@@ -50,6 +51,9 @@ public:
 private:
     Operation operation;
 
+    Node* clone() const override;
+    int getMaxChildrenCountForOperation(Operation op) const;
+
     friend class Tree;
     friend class Node;
 };
@@ -64,6 +68,8 @@ public:
 private:
     std::string name;
 
+    Node* clone() const override;
+
     friend class Tree;
     friend class Node;
 };
@@ -77,6 +83,8 @@ public:
 
 private:
     double value;
+
+    Node* clone() const override;
 
     friend class Tree;
     friend class Node;
@@ -95,7 +103,6 @@ public:
     std::vector<std::string> getVariables();
     std::string toString();
     double calculateFormula(std::vector<double>& values, bool& isSizeCorrect);
-    
 
 private:
     Node* root;

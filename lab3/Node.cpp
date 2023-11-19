@@ -22,7 +22,7 @@ Node::Node(const Node& other)
     , maxChildrenCount(other.maxChildrenCount)
 {
     for (const Node* childNode : other.children) {
-        Node* newChild = new Node(*childNode);
+        Node* newChild = childNode->clone();
         newChild->parent = this;
         children.push_back(newChild);
     }
@@ -49,11 +49,6 @@ int Node::getChildrenCount()
     return children.size();
 }
 
-std::string Node::toString(std::string& acc)
-{
-    return "test";
-}
-
 std::set<std::string> Node::getVariables(std::set<std::string>& variables)
 {
     for (Node* childNode : children) {
@@ -74,13 +69,13 @@ double Node::calculateValue(std::map<std::string, double>& variableValues)
 // OPERATOR
 
 OperatorNode::OperatorNode(Operation op)
-    : Node(op)
+    : Node(getMaxChildrenCountForOperation(op))
     , operation(op)
 {
 }
 
 OperatorNode::OperatorNode(Node* parent, Operation op)
-    : Node(op, parent)
+    : Node(getMaxChildrenCountForOperation(op), parent)
     , operation(op)
 {
 }
@@ -129,6 +124,22 @@ double OperatorNode::calculateValue(std::map<std::string, double>& variableValue
     return 1.0;
 }
 
+Node* OperatorNode::clone() const
+{
+    return new OperatorNode(*this);
+}
+
+int OperatorNode::getMaxChildrenCountForOperation(Operation op) const
+{
+    if (op == plus || op == minus || op == multiply || op == divide) {
+        return 2;
+    } else if (op == sin_op || op == cos_op) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
 // VARIABLE
 
 VariableNode::VariableNode(std::string name)
@@ -160,6 +171,11 @@ double VariableNode::calculateValue(std::map<std::string, double>& variableValue
     return variableValues.at(name);
 }
 
+Node* VariableNode::clone() const
+{
+    return new VariableNode(*this);
+}
+
 // NUMBER
 
 NumberNode::NumberNode(double value)
@@ -189,4 +205,9 @@ std::string NumberNode::toString(std::string& acc)
 double NumberNode::calculateValue(std::map<std::string, double>& variableValues)
 {
     return value;
+}
+
+Node* NumberNode::clone() const
+{
+    return new NumberNode(*this);
 }

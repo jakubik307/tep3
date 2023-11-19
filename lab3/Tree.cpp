@@ -2,7 +2,7 @@
 
 Tree::Tree()
 {
-    root = new Node(0);
+    root = new NumberNode(1);
 }
 
 Tree::Tree(Node* root)
@@ -50,7 +50,7 @@ Tree Tree::operator+(const Tree& other) const
         if (leafNode->parent != nullptr) {
             for (Node* node : leafNode->parent->children) {
                 if (node == leafNode) {
-                    node = copyOfOther.root;
+                    node = root->clone();
                 }
             }
         }
@@ -73,7 +73,7 @@ void Tree::copy(Tree const& other)
         delete root;
     }
 
-    root = new Node(*other.root);
+    root = other.root->clone();
 }
 
 std::vector<std::string> Tree::getVariables()
