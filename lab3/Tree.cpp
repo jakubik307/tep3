@@ -145,10 +145,6 @@ Node* Tree::parseFormula(std::istringstream& iss, bool& isCorrect)
         opNode->addChild(parseFormula(iss, isCorrect)); // Parse left child
         opNode->addChild(parseFormula(iss, isCorrect)); // Parse right child
         return opNode;
-    } else {
-        // Invalid token
-        isCorrect = false;
-        return nullptr;
     }
 }
 
