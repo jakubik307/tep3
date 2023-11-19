@@ -16,7 +16,7 @@ Node::Node(int maxChildrenCount, Node* parent)
     children = std::vector<Node*>();
 }
 
-// TODO: chceck if copying nullptr is okay in all usages
+// TODO: check if copying nullptr is okay in all usages
 Node::Node(const Node& other)
     : parent(nullptr)
     , maxChildrenCount(other.maxChildrenCount)
@@ -51,19 +51,24 @@ int Node::getChildrenCount()
 
 std::string Node::toString(std::string& acc)
 {
-    return acc;
+    return "test";
 }
 
 std::set<std::string> Node::getVariables(std::set<std::string>& variables)
 {
     for (Node* childNode : children) {
-        VariableNode* variableNode = dynamic_cast<VariableNode*>(this);
+        VariableNode* variableNode = dynamic_cast<VariableNode*>(childNode);
         if (variableNode != nullptr) {
             variables.insert(variableNode->name);
         }
     }
 
     return variables;
+}
+
+double Node::calculateValue(std::map<std::string, double>& variableValues)
+{
+    return 1.0;
 }
 
 // OPERATOR
@@ -105,6 +110,25 @@ std::string OperatorNode::toString(std::string& acc)
     return acc;
 }
 
+double OperatorNode::calculateValue(std::map<std::string, double>& variableValues)
+{
+    if (operation == plus) {
+        return children[0]->calculateValue(variableValues) + children[1]->calculateValue(variableValues);
+    } else if (operation == minus) {
+        return children[0]->calculateValue(variableValues) - children[1]->calculateValue(variableValues);
+    } else if (operation == multiply) {
+        return children[0]->calculateValue(variableValues) * children[1]->calculateValue(variableValues);
+    } else if (operation == divide) {
+        return children[0]->calculateValue(variableValues) / children[1]->calculateValue(variableValues);
+    } else if (operation == sin_op) {
+        return sin(children[0]->calculateValue(variableValues));
+    } else if (operation == cos_op) {
+        return cos(children[0]->calculateValue(variableValues));
+    }
+
+    return 1.0;
+}
+
 // VARIABLE
 
 VariableNode::VariableNode(std::string name)
@@ -131,6 +155,11 @@ std::string VariableNode::toString(std::string& acc)
     return acc;
 }
 
+double VariableNode::calculateValue(std::map<std::string, double>& variableValues)
+{
+    return variableValues.at(name);
+}
+
 // NUMBER
 
 NumberNode::NumberNode(double value)
@@ -155,4 +184,9 @@ std::string NumberNode::toString(std::string& acc)
     }
 
     return acc;
+}
+
+double NumberNode::calculateValue(std::map<std::string, double>& variableValues)
+{
+    return value;
 }

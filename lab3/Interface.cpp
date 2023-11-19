@@ -28,11 +28,11 @@ void runInterface()
             if (command == "enter") {
                 tree = Tree(params, isCorrect);
                 if (!isCorrect) {
-                    std::cout << "Error: Formula is not correct. Expression will be corrected.";
+                    std::cout << "Error: Formula is not correct. Expression will be corrected." << std::endl;
                     std::cout << "Processing formula: " + tree.toString() << std::endl;
                 }
             } else if (command == "vars") {
-                std::set<std::string> variables = tree.getVariables();
+                std::vector<std::string> variables = tree.getVariables();
                 if (!variables.empty()) {
                     for (std::string variable : tree.getVariables()) {
                         std::cout << variable + " ";
@@ -52,7 +52,7 @@ void runInterface()
                     std::cout << "Processing formula: " + newTree.toString() << std::endl;
                 }
                 tree = tree + newTree;
-                std::cout << "Merge succesful: " + newTree.toString() << std::endl;
+                std::cout << "Merge successful: " + newTree.toString() << std::endl;
 
             } else {
                 std::cout << "Error: Unknown command." << std::endl;

@@ -12,7 +12,15 @@ Tree::Tree(Node* root)
 
 Tree::Tree(std::string& formula, bool& isCorrect)
 {
-    // TODO
+    isCorrect = true;
+
+    std::istringstream iss(formula);
+    root = parseFormula(iss, isCorrect);
+
+    if (!iss.eof()) {
+        // If there are characters remaining in the stream, the formula is incorrect
+        isCorrect = false;
+    }
 }
 
 Tree::Tree(Tree const& other)
@@ -106,4 +114,57 @@ double Tree::calculateFormula(std::vector<double>& values, bool& isSizeCorrect)
     double result = root->calculateValue(variableValues);
 
     return result;
+}
+
+Node* Tree::parseFormula(std::istringstream& iss, bool& isCorrect)
+{
+    std::string token;
+    iss >> token;
+
+    if (token.empty()) {
+        // Empty token, not a valid formula
+        isCorrect = false;
+        return nullptr;
+    }
+
+    if (isdigit(token[0])) {
+        // Token is a number
+        return new NumberNode(std::stod(token));
+    } else if (isalpha(token[0])) {
+        // Token is a variable or function
+        if (token == "sin" || token == "cos") {
+            OperatorNode* opNode = new OperatorNode(getOperationType(token));
+            opNode->addChild(parseFormula(iss, isCorrect)); // Parse operand
+            return opNode;
+        } else {
+            return new VariableNode(token);
+        }
+    } else if (token == "+" || token == "-" || token == "*" || token == "/") {
+        // Token is a binary operator
+        OperatorNode* opNode = new OperatorNode(getOperationType(token));
+        opNode->addChild(parseFormula(iss, isCorrect)); // Parse left child
+        opNode->addChild(parseFormula(iss, isCorrect)); // Parse right child
+        return opNode;
+    } else {
+        // Invalid token
+        isCorrect = false;
+        return nullptr;
+    }
+}
+
+Operation Tree::getOperationType(const std::string& op)
+{
+    if (op == "+") {
+        return plus;
+    } else if (op == "-") {
+        return minus;
+    } else if (op == "*") {
+        return multiply;
+    } else if (op == "/") {
+        return divide;
+    } else if (op == "sin") {
+        return sin_op;
+    } else if (op == "cos") {
+        return cos_op;
+    }
 }
