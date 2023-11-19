@@ -6,19 +6,19 @@ Tree::Tree()
 }
 
 Tree::Tree(Node* root)
+    : root(root)
 {
-    this->root = root;
 }
 
-Tree::Tree(std::string& formula, bool& isCorrect)
+Tree::Tree(std::vector<std::string>& formula, bool& isCorrect)
 {
     isCorrect = true;
 
-    std::istringstream iss(formula);
-    root = parseFormula(iss, isCorrect);
+    std::vector<std::string>::iterator it = formula.begin();
+    root = parseFormula(it, formula.end(), isCorrect);
 
-    if (!iss.eof()) {
-        // If there are characters remaining in the stream, the formula is incorrect
+    if (it != formula.end()) {
+        // If there are elements remaining in the vector, the formula is incorrect
         isCorrect = false;
     }
 }
@@ -116,16 +116,16 @@ double Tree::calculateFormula(std::vector<double>& values, bool& isSizeCorrect)
     return result;
 }
 
-Node* Tree::parseFormula(std::istringstream& iss, bool& isCorrect)
+Node* Tree::parseFormula(std::vector<std::string>::iterator& it, const std::vector<std::string>::iterator& end, bool& isCorrect)
 {
-    std::string token;
-    iss >> token;
-
-    if (token.empty()) {
+    if (it == end) {
         // Empty token, not a valid formula
         isCorrect = false;
         return nullptr;
     }
+
+    std::string token = *it;
+    it++;
 
     if (isdigit(token[0])) {
         // Token is a number
@@ -134,7 +134,7 @@ Node* Tree::parseFormula(std::istringstream& iss, bool& isCorrect)
         // Token is a variable or function
         if (token == "sin" || token == "cos") {
             OperatorNode* opNode = new OperatorNode(getOperationType(token));
-            opNode->addChild(parseFormula(iss, isCorrect)); // Parse operand
+            opNode->addChild(parseFormula(it, end, isCorrect)); // Parse operand
             return opNode;
         } else {
             return new VariableNode(token);
@@ -142,9 +142,12 @@ Node* Tree::parseFormula(std::istringstream& iss, bool& isCorrect)
     } else if (token == "+" || token == "-" || token == "*" || token == "/") {
         // Token is a binary operator
         OperatorNode* opNode = new OperatorNode(getOperationType(token));
-        opNode->addChild(parseFormula(iss, isCorrect)); // Parse left child
-        opNode->addChild(parseFormula(iss, isCorrect)); // Parse right child
+        opNode->addChild(parseFormula(it, end, isCorrect)); // Parse left child
+        opNode->addChild(parseFormula(it, end, isCorrect)); // Parse right child
         return opNode;
+    } else {
+        isCorrect = false;
+        return new NumberNode(1);
     }
 }
 
@@ -162,5 +165,7 @@ Operation Tree::getOperationType(const std::string& op)
         return sin_op;
     } else if (op == "cos") {
         return cos_op;
+    } else {
+        return plus;
     }
 }

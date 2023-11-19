@@ -16,7 +16,6 @@ Node::Node(int maxChildrenCount, Node* parent)
     children = std::vector<Node*>();
 }
 
-// TODO: check if copying nullptr is okay in all usages
 Node::Node(const Node& other)
     : parent(nullptr)
     , maxChildrenCount(other.maxChildrenCount)

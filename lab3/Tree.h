@@ -94,7 +94,7 @@ class Tree {
 public:
     Tree();
     Tree(Node* root);
-    Tree(std::string& formula, bool& isCorrect);
+    Tree(std::vector<std::string>& formula, bool& isCorrect);
     Tree(Tree const& other);
     ~Tree();
     Tree operator+(const Tree& other) const;
@@ -108,6 +108,6 @@ private:
     Node* root;
 
     void copy(Tree const& other);
-    Node* parseFormula(std::istringstream& iss, bool& isCorrect);
+    Node* parseFormula(std::vector<std::string>::iterator& it, const std::vector<std::string>::iterator& end, bool& isCorrect);
     Operation getOperationType(const std::string& op);
 };

@@ -5,31 +5,55 @@ void runInterface()
     Tree tree;
     bool isCorrect;
     std::string input = "start";
+    std::vector<std::string> params;
 
     while (input != "quit" && input != "exit") {
+        // Get user input
         std::cout << "Waiting for user input:" << std::endl;
         std::getline(std::cin, input);
+
+        // Input preprocessing
         input = toLowercase(input);
         input = strip(input);
+        bool noUnsupportedCharacters;
+        input = removeNonOperators(input, noUnsupportedCharacters);
+        if (!noUnsupportedCharacters) {
+            std::cout << "Unsupported characters detected - they have been removed from input." << std::endl;
+            std::cout << "Processed input: " << input << std::endl;
+        }
 
+        // Process input
         if (!input.empty()) {
             std::istringstream iss(input);
-            std::string command, params;
-            params = "";
+            std::string command;
 
             iss >> command;
 
-            if (iss) {
-                std::getline(iss, params);
-                params = strip(params);
+            // Read the rest of the parameters into a vector
+            params.clear();
+            while (iss) {
+                std::string param;
+                iss >> param;
+                if (!param.empty()) {
+                    params.push_back(param);
+                }
+            }
+
+            // Params preprocessing
+            for (std::string param : params) {
+                param = fixDotsInNumbers(param);
             }
 
             // TODO : export strings to .h
             if (command == "enter") {
-                tree = Tree(params, isCorrect);
-                if (!isCorrect) {
-                    std::cout << "Error: Formula is not correct. Expression will be corrected." << std::endl;
-                    std::cout << "Processing formula: " + tree.toString() << std::endl;
+                if (params.empty()) {
+                    std::cout << "Error: No formula given" << std::endl;
+                } else {
+                    tree = Tree(params, isCorrect);
+                    if (!isCorrect) {
+                        std::cout << "Error: Formula is not correct. Expression will be corrected." << std::endl;
+                        std::cout << "Processing formula: " + tree.toString() << std::endl;
+                    }
                 }
             } else if (command == "vars") {
                 std::vector<std::string> variables = tree.getVariables();
@@ -44,7 +68,8 @@ void runInterface()
             } else if (command == "print") {
                 std::cout << tree.toString() << std::endl;
             } else if (command == "comp") {
-                // TODO
+                bool matchingSize;
+                // double result = tree.calculateFormula(params, matchingSize);
             } else if (command == "join") {
                 Tree newTree = Tree(params, isCorrect);
                 if (!isCorrect) {
@@ -108,3 +133,41 @@ std::string strip(std::string& input)
 
     return result;
 }
+
+std::string removeNonOperators(const std::string& input, bool& isCorrect)
+{
+    std::string result;
+
+    for (char ch : input) {
+        if (std::isalnum(ch) || ch == '+' || ch == '-' || ch == '*' || ch == '/' || ch == ' ' || ch == '.') {
+            result += ch;
+        }
+    }
+
+    isCorrect = result == input;
+    return result;
+}
+
+std::string fixDotsInNumbers(const std::string& input)
+{
+    std::string result;
+
+    if (input[0] == '.') {
+        result += "0";
+    }
+
+    bool firstDot = false;
+
+    for (char c : input) {
+        if (c == '.') {
+            if (!firstDot) {
+                firstDot = true;
+            }
+        } else {
+            result += c;
+            firstDot = false;
+        }
+    }
+
+    return result;
+};
